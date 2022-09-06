@@ -79,18 +79,16 @@
     <Compile Include="AboutForm.Designer.cs">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="decoderXml.cs" />
-    <Compile Include="encoderXml.cs" />
-    <Compile Include="rxdataeditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="rxdataeditor.Designer.cs">
-      <DependentUpon>rxdataeditor.cs</DependentUpon>
-    </Compile>
     <Compile Include="imglist.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>imglist.resx</DependentUpon>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,12 +107,12 @@
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="rxdataeditor.resx">
-      <DependentUpon>rxdataeditor.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="imglist.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>imglist.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -149,13 +147,7 @@
     <None Include="Resources\open.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\打o开.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\menu.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\菜单.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -168,6 +160,15 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Decoder\Decoder.csproj">
+      <Project>{E89C1CBE-FD30-45AD-B1E2-2BFA6FE8324C}</Project>
+      <Name>Decoder</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Image1.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

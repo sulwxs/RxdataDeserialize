@@ -1,5 +1,5 @@
-﻿using rxdatadecoder.rxdatadecoder;
-namespace rxdatadecoder
+﻿
+namespace rxdataEditor
 {
     partial class RxdataEditor
     {
@@ -12,7 +12,7 @@ namespace rxdatadecoder
         /// 清理所有正在使用的资源。
         /// </summary>
         /// <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
-        protected override void Dispose(bool disposing=true)
+        protected override void Dispose(bool disposing = true)
         {
             if (disposing && (components != null))
             {
@@ -256,7 +256,7 @@ namespace rxdatadecoder
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList1.Images.SetKeyName(0, "serv.png");
             this.imageList1.Images.SetKeyName(1, "folder.png");
-            this.imageList1.Images.SetKeyName(2, "打开.png");
+            this.imageList1.Images.SetKeyName(2, "serv.png");
             this.imageList1.Images.SetKeyName(3, "24gf-folderOpen.png");
             // 
             // splitContainer2
@@ -528,7 +528,7 @@ namespace rxdatadecoder
 
         #endregion
 
-        
+
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;

@@ -1,5 +1,5 @@
 ﻿
-namespace rxdatadecoder
+namespace rxdataEditor
 {
     partial class StringEditor
     {

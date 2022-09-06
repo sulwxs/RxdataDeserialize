@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace rxdatadecoder
+namespace rxdataEditor
 {
     public partial class StringEditor : Form
     {

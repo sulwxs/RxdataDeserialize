@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace rxdatadecoder
+namespace rxdataEditor
 {
     public partial class AboutForm : Form
     {

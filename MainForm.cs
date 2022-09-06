@@ -1,4 +1,6 @@
-﻿using rxdataencoder;
+﻿
+
+using Decoder;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,11 +11,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-namespace rxdatadecoder
+
+namespace rxdataEditor
 {
     public partial class RxdataEditor : Form
     {
-        public rxdatadecoder.DecoderXml decoder;
+        public DecoderXml decoder;
         public XmlDocument xld;
         public List<XmlNode> Symbollist;
         public List<TreeNode> Instlist;
@@ -24,6 +27,7 @@ namespace rxdatadecoder
         public List<TreeNode> treeNodes = null;
         SynchronizationContext SyncContext = null;
         public bool isshowouterxml = false;
+        byte[] restbytes;
         public RxdataEditor()
         {
             InitializeComponent();
@@ -116,10 +120,20 @@ namespace rxdatadecoder
             String dump = "";
             try
             {
-                dump = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + decoder.Parse(decoder.GetStream());
+                dump = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" ;
+                String temp=decoder.addTag("section", decoder.Parse(decoder.GetStream()));
+                while (decoder.tryReadVer(decoder.GetStream()))
+                {
+                   
+                    temp+=decoder.addTag("section", decoder.Parse(decoder.GetStream()));
+                }
+                dump += decoder.addTag("root",temp);
                 result = new List<Object>();
                 result.Add(dump);
-                decoder.GetStream().Close();
+                long restlen = decoder.GetStream().Length - decoder.GetStream().Position;
+                restbytes = new byte[restlen];
+                decoder.GetStream().Read(restbytes,0, (int)restlen);
+                    decoder.GetStream().Close();
                 xld.LoadXml(dump);
                 dump = FormatXML(xld);
                 xld.LoadXml(dump);
@@ -216,6 +230,8 @@ namespace rxdatadecoder
                 XmlNode xmlNode1 = null;
                 switch (temp.ToLower().Trim())
                 {
+                   
+                       
                     case "symbol":
                         temp = node.InnerText;
                         //continue;
@@ -275,15 +291,25 @@ namespace rxdatadecoder
                         //  temp = list[int.Parse(temp.Replace("0x", ""), System.Globalization.NumberStyles.HexNumber)];
                         //temp = element.GetAttribute("classname");
                         break;
+
+                }
+                if (temp != "section")
+                {
+                    TreeNode new_child = new TreeNode(temp);
+                    new_child.Tag = node;
+                    parent.Nodes.Add(new_child);
+                    RecursionTreeControl(node, new_child);
+                }
+                else 
+                {
+                    
+                 
+                    RecursionTreeControl(node, parent);
                 }
 
-                TreeNode new_child = new TreeNode(temp);            //定义一个TreeNode节点对象
+               
 
-                new_child.Tag = node;
-
-                parent.Nodes.Add(new_child);         //向当前TreeNodeCollection集合中添加当前节点
-
-                RecursionTreeControl(node, new_child);   //调用本方法进行递归
+                 
 
 
 
@@ -538,7 +564,7 @@ namespace rxdatadecoder
                     SyncContext = SynchronizationContext.Current;
                     String fpath = openFileDialog1.FileName;
                     xld = new XmlDocument();
-                    decoder = new rxdatadecoder.DecoderXml(fpath);
+                    decoder = new DecoderXml(fpath);
                     decoder.updateAction = getdecodePogress;
                     decoder.context = SynchronizationContext.Current;
                     ver.Text = decoder.Ver;
@@ -589,7 +615,7 @@ namespace rxdatadecoder
         {
             if (savepath != "")
             {
-                encoderXml encoder = new encoderXml(xld);
+                EncoderXml encoder = new EncoderXml(xld);
                 savepath = saveFileDialog1.FileName;
                 encoder.startEncode(saveFileDialog1.FileName);
                 GC.Collect();
@@ -601,9 +627,13 @@ namespace rxdatadecoder
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 this.Text = "RXDATA EDITOR -" + saveFileDialog1.FileName;
-                encoderXml encoder = new encoderXml(xld);
+                EncoderXml encoder = new EncoderXml(xld);
                 savepath = openFileDialog1.FileName;
                 encoder.startEncode(saveFileDialog1.FileName);
+                if (restbytes != null)
+                { FileStream stream = new FileStream(saveFileDialog1.FileName, FileMode.Append, FileAccess.Write);
+
+                    stream.Write(restbytes, 0,restbytes.Length); }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
@@ -634,7 +664,7 @@ namespace rxdatadecoder
                 {
                     savepath = saveFileDialog1.FileName;
                     this.Text = "RXDATA EDITOR -" + saveFileDialog1.FileName;
-                    encoderXml encoder = new encoderXml(xld);
+                    EncoderXml encoder = new EncoderXml(xld);
                     savepath = saveFileDialog1.FileName;
                     encoder.startEncode(saveFileDialog1.FileName);
                     GC.Collect();
