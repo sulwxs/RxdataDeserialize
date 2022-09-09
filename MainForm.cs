@@ -120,7 +120,7 @@ namespace rxdataEditor
             String dump = "";
             try
             {
-                dump = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" ;
+                dump = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ;
                 String temp=decoder.addTag("section", decoder.Parse(decoder.GetStream()));
                 while (decoder.tryReadVer(decoder.GetStream()))
                 {
@@ -184,20 +184,40 @@ namespace rxdataEditor
         {//rxdatadecoder.DecoderXml decoder,XmlDocument xld,List<String> list
 
             String dump = FormatXML(xld);
-
-            //xld.LoadXml();
+            result = new List<Object>();
+            result.Add(dump);
+            //long restlen = decoder.GetStream().Length - decoder.GetStream().Position;
+            //restbytes = new byte[restlen];
+            //decoder.GetStream().Read(restbytes, 0, (int)restlen);
+           // decoder.GetStream().Close();
+            xld.LoadXml(dump);
+            dump = FormatXML(xld);
+            xld.LoadXml(dump);
             TreeNode rootnode = new TreeNode(xld.DocumentElement.Name);
-
+            rootnode.Tag = xld.DocumentElement;
             Instlist = new List<TreeNode>();
 
-            rootnode.Tag = xld.DocumentElement;
+            Symbollist = new List<XmlNode>();
+            getSymbolInstances(Symbollist, xld.DocumentElement);
+
+            //result.Add(dump);
+            result.Add(Symbollist);
+            result.Add(rootnode);
             RecursionTreeControl(xld.DocumentElement, rootnode);
             getLinkInstances(rootnode);
-            List<Object> result = new List<Object>();
-            result.Add(dump);
+            //xld.LoadXml();
+            /* TreeNode rootnode = new TreeNode(xld.DocumentElement.Name);
 
-            result.Add(Instlist);
-            result.Add(rootnode);
+             Instlist = new List<TreeNode>();
+
+             rootnode.Tag = xld.DocumentElement;
+             RecursionTreeControl(xld.DocumentElement, rootnode);
+             getLinkInstances(rootnode);
+             List<Object> result = new List<Object>();
+             result.Add(dump);
+
+             result.Add(Instlist);
+             result.Add(rootnode);*/
 
             return result;
 
@@ -553,7 +573,20 @@ namespace rxdataEditor
                 this.Text = "RXDATA EDITOR -" + openFileDialog1.SafeFileName;
                 if (openFileDialog1.SafeFileName.EndsWith("xml") || openFileDialog1.SafeFileName.EndsWith("txt"))
                 {
+                   
+                    toolStripStatusLabel1.Text = "加载中";
+                    SyncContext = SynchronizationContext.Current;
+                    String fpath = openFileDialog1.FileName;
                     xld = new XmlDocument();
+                    //decoder = new DecoderXml(fpath);
+                    //decoder.updateAction = getdecodePogress;
+                    //decoder.context = SynchronizationContext.Current;
+                    //ver.Text = decoder.Ver;
+                    toolStrip1.Enabled = false;
+
+                  //  mydecode = new decodefile(DecodeFile);
+
+                  //  mydecode.BeginInvoke(new AsyncCallback(finishDecode), mydecode);
                     xld.Load(openFileDialog1.FileName);
                     Func<List<Object>> action = DecodeXml;
                     action.BeginInvoke(finishDecodeXml, action);
@@ -606,6 +639,8 @@ namespace rxdataEditor
 
         private void LToolStripButton_Click(object sender, EventArgs e)
         {
+            string a = "\\x00\\x01\\x1f";
+            MessageBox.Show(EncoderXml.ReplaceHexSymbols(a));
             AboutForm aboutForm = new AboutForm();
 
             aboutForm.ShowDialog(this.Location);
@@ -631,9 +666,11 @@ namespace rxdataEditor
                 savepath = openFileDialog1.FileName;
                 encoder.startEncode(saveFileDialog1.FileName);
                 if (restbytes != null)
-                { FileStream stream = new FileStream(saveFileDialog1.FileName, FileMode.Append, FileAccess.Write);
-
-                    stream.Write(restbytes, 0,restbytes.Length); }
+                { 
+                    FileStream stream = new FileStream(saveFileDialog1.FileName, FileMode.Append, FileAccess.Write);
+                    stream.Write(restbytes, 0,restbytes.Length);
+                    stream.Close();
+                }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
