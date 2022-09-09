@@ -31,13 +31,13 @@ namespace rxdataEditor
         public RxdataEditor()
         {
             InitializeComponent();
-            //  propertyGrid1.SelectedObject = new XmlProperty(null);
+
 
         }
 
 
         /// <summary>
-        /// 更新解码进度
+        /// 更新进度
         /// </summary>
         public void getdecodePogress()
         {
@@ -58,7 +58,7 @@ namespace rxdataEditor
                     SyncContext.Post((re) =>
                     {
 
-                        //richTextBox1.Text = (string)result[0];
+                        
                         addtoSymbolListView();
                         addtoInstListView();
                         toolStrip1.Enabled = true;
@@ -116,7 +116,7 @@ namespace rxdataEditor
         /// <param name="list"></param>
         /// <returns></returns>
         public void DecodeFile()
-        {//rxdatadecoder.DecoderXml decoder,XmlDocument xld,List<String> list
+        {
             String dump = "";
             try
             {
@@ -181,15 +181,10 @@ namespace rxdataEditor
             }
         }
         public List<Object> DecodeXml()
-        {//rxdatadecoder.DecoderXml decoder,XmlDocument xld,List<String> list
-
+        {
             String dump = FormatXML(xld);
             result = new List<Object>();
             result.Add(dump);
-            //long restlen = decoder.GetStream().Length - decoder.GetStream().Position;
-            //restbytes = new byte[restlen];
-            //decoder.GetStream().Read(restbytes, 0, (int)restlen);
-           // decoder.GetStream().Close();
             xld.LoadXml(dump);
             dump = FormatXML(xld);
             xld.LoadXml(dump);
@@ -205,19 +200,7 @@ namespace rxdataEditor
             result.Add(rootnode);
             RecursionTreeControl(xld.DocumentElement, rootnode);
             getLinkInstances(rootnode);
-            //xld.LoadXml();
-            /* TreeNode rootnode = new TreeNode(xld.DocumentElement.Name);
-
-             Instlist = new List<TreeNode>();
-
-             rootnode.Tag = xld.DocumentElement;
-             RecursionTreeControl(xld.DocumentElement, rootnode);
-             getLinkInstances(rootnode);
-             List<Object> result = new List<Object>();
-             result.Add(dump);
-
-             result.Add(Instlist);
-             result.Add(rootnode);*/
+   
 
             return result;
 
@@ -270,7 +253,9 @@ namespace rxdataEditor
                         }
                         //temp = element.GetAttribute("classname");
                         break;
-
+                    case "b":
+                        temp =node.InnerText;
+                        break;
                     case "i":
                         xmlNode1 = node.FirstChild;
                         String Itype = xmlNode1.Name;
@@ -307,9 +292,7 @@ namespace rxdataEditor
                         break;
                     case "link":
                         temp = node.FirstChild.InnerText;
-                        //if (temp.Contains("0x"))
-                        //  temp = list[int.Parse(temp.Replace("0x", ""), System.Globalization.NumberStyles.HexNumber)];
-                        //temp = element.GetAttribute("classname");
+           
                         break;
 
                 }
@@ -353,9 +336,7 @@ namespace rxdataEditor
         public static string FormatXML(XmlDocument document)
         {
 
-            //if (!XMLstring.Contains("<?xml version")) return XMLstring;
-            //XmlDocument document = new XmlDocument();
-            //  document.LoadXml(XMLstring);
+     
             MemoryStream memoryStream = new MemoryStream();
             XmlTextWriter writer = new XmlTextWriter(memoryStream, null)
             {
@@ -578,15 +559,8 @@ namespace rxdataEditor
                     SyncContext = SynchronizationContext.Current;
                     String fpath = openFileDialog1.FileName;
                     xld = new XmlDocument();
-                    //decoder = new DecoderXml(fpath);
-                    //decoder.updateAction = getdecodePogress;
-                    //decoder.context = SynchronizationContext.Current;
-                    //ver.Text = decoder.Ver;
+     
                     toolStrip1.Enabled = false;
-
-                  //  mydecode = new decodefile(DecodeFile);
-
-                  //  mydecode.BeginInvoke(new AsyncCallback(finishDecode), mydecode);
                     xld.Load(openFileDialog1.FileName);
                     Func<List<Object>> action = DecodeXml;
                     action.BeginInvoke(finishDecodeXml, action);
@@ -639,8 +613,7 @@ namespace rxdataEditor
 
         private void LToolStripButton_Click(object sender, EventArgs e)
         {
-            string a = "\\x00\\x01\\x1f";
-            MessageBox.Show(EncoderXml.ReplaceHexSymbols(a));
+            
             AboutForm aboutForm = new AboutForm();
 
             aboutForm.ShowDialog(this.Location);
@@ -737,10 +710,17 @@ namespace rxdataEditor
             try
             {
                 XmlNode node = (XmlNode)e.Node.Tag;
+                xmlcheckBox1.Enabled = true;
+                checkBox1.Checked = false;
                 if (xmlcheckBox1.Checked)
-                    textBox1.Text = node.OuterXml.Replace("><", ">\r\n<");
+                { textBox1.Text = node.OuterXml.Replace("><", ">\r\n<");
+                    
+                }
                 else
+                {
+                    textBox1.Enabled = false;
                     textBox1.Text = node.InnerXml.Replace("><", ">\r\n<");
+                }
                 propertyDisp1.node = node;
                 propertyDisp1.updateView();
 
@@ -770,7 +750,7 @@ namespace rxdataEditor
             save.Text = "保存";
             save.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             save.Dock = DockStyle.Bottom;
-            //save.Location = textBox1.Location;
+  
             textBox1.Controls.Add(save);
         }
 
@@ -807,7 +787,33 @@ namespace rxdataEditor
 
         private void savebtn_Click(object sender, EventArgs e)
         {
-            propertyDisp1.saveNode();
+            if (checkBox1.Checked)//源码
+            {
+                ModifyXmlNode(treeView1.SelectedNode);
+            }
+            else
+                propertyDisp1.saveNode();
+        }
+        private void ModifyXmlNode(TreeNode node)
+        { XmlNode xmlnode = (XmlNode)node.Tag;
+            node.Nodes.Clear();
+            xmlnode.InnerXml = textBox1.Text;
+            
+            RecursionTreeControl(xmlnode, node);
+        }
+        private void BatchBtn_Click(object sender, EventArgs e)
+        {
+           
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            bool check = checkBox1.Checked;
+            xmlcheckBox1.Checked = !check;
+            xmlcheckBox1.Enabled = !check;
+            propertyDisp1.Enabled = !check;
+            textBox1.Enabled = check;
         }
     }
 
